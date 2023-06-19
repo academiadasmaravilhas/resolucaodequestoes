@@ -20,7 +20,7 @@ namespace Trabalho_2C
         Questão questao;
         // diretorio atual
         string diretorioAtual;
-
+        private int indiceAtual = -1; // Adicione essa variável como campo de classe
         public FormPrincipal()
         {
             // Não precisa se preocupar aqui -----------------------
@@ -38,7 +38,7 @@ namespace Trabalho_2C
             string[] diretorios = Directory.GetDirectories(diretorioAtual);
 
             // Percorre cada string dentro do vetor de strings
-            for(int i = 0; i < diretorios.Length; i++)
+            for (int i = 0; i < diretorios.Length; i++)
             {
                 // Para cada caminho, quero obter apenas o nome da disciplina
                 string nomeDaDisciplina = diretorios[i].Remove(0, diretorioAtual.Length);
@@ -69,7 +69,7 @@ namespace Trabalho_2C
                 // Cria um leitor para ler as informações da questão
                 StreamReader leitor = new StreamReader(arquivos[0]);
 
-                // Preenche os atriburos de questão com as informações lidas do arquivo
+                // Preenche os atributos da questão com as informações lidas do arquivo
                 questao.enunciado = leitor.ReadLine();
                 questao.altA = leitor.ReadLine();
                 questao.altB = leitor.ReadLine();
@@ -88,5 +88,171 @@ namespace Trabalho_2C
                 leitor.Close();
             }
         }
+
+        private void btnProximaPergunta_Click(object sender, EventArgs e)
+        {
+
+            if (cmbDisciplinas.SelectedIndex >= 0)
+            {
+
+                string diretorioMateria = diretorioAtual + cmbDisciplinas.Text;
+
+
+                string[] arquivos = Directory.GetFiles(diretorioMateria, "*.txt");
+
+
+                if (arquivos.Length > 0)
+                {
+
+                    if (indiceAtual == arquivos.Length - 1)
+                    {
+                        MessageBox.Show("Você chegou na última pergunta.");
+                    }
+                    else
+                    {
+
+                        indiceAtual++;
+
+
+                        string proximoArquivo = arquivos[indiceAtual];
+
+
+                        using (StreamReader leitor = new StreamReader(proximoArquivo))
+                        {
+
+                            Questão proximaQuestao = new Questão();
+
+                            proximaQuestao.enunciado = leitor.ReadLine();
+                            proximaQuestao.altA = leitor.ReadLine();
+                            proximaQuestao.altB = leitor.ReadLine();
+                            proximaQuestao.altC = leitor.ReadLine();
+                            proximaQuestao.altD = leitor.ReadLine();
+                            proximaQuestao.altE = leitor.ReadLine();
+
+                            questao = proximaQuestao;
+
+                            txtEnunciado.Text = questao.enunciado;
+                            rdbA.Text = questao.altA;
+                            rdbB.Text = questao.altB;
+                            rdbC.Text = questao.altC;
+                            rdbD.Text = questao.altD;
+                            rdbE.Text = questao.altE;
+
+
+ 
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Não há questões na pasta selecionada!");
+                }
+            }
+        }
+
+        private void btnResponder_Click(object sender, EventArgs e)
+        {
+            if (cmbDisciplinas.SelectedIndex >= 0)
+            {
+
+                string diretorioMateria = diretorioAtual + cmbDisciplinas.Text;
+
+
+                string[] arquivos = Directory.GetFiles(diretorioMateria, "*.txt");
+
+                if (arquivos.Length > 0)
+                {
+
+                    if (rdbA.Checked || rdbB.Checked || rdbC.Checked || rdbD.Checked || rdbE.Checked)
+                    {
+
+                        if (indiceAtual >= 0 && indiceAtual < arquivos.Length)
+                        {
+
+                            string arquivoQuestaoAtual = arquivos[indiceAtual];
+
+
+                            using (StreamReader leitor = new StreamReader(arquivoQuestaoAtual))
+                            {
+
+                                string enunciado = leitor.ReadLine();
+                                string altA = leitor.ReadLine();
+                                string altB = leitor.ReadLine();
+                                string altC = leitor.ReadLine();
+                                string altD = leitor.ReadLine();
+                                string altE = leitor.ReadLine();
+                                string resolucao = leitor.ReadLine();
+                                int numeroAcertos = int.Parse(leitor.ReadLine());
+                                int numeroErros = int.Parse(leitor.ReadLine());
+                                string respostaCorreta = leitor.ReadLine();
+
+                                string respostaSelecionada = "";
+                                if (rdbA.Checked)
+                                {
+                                    respostaSelecionada = "a";
+                                }
+                                else if (rdbB.Checked)
+                                {
+                                    respostaSelecionada = "b";
+                                }
+                                else if (rdbC.Checked)
+                                {
+                                    respostaSelecionada = "c";
+                                }
+                                else if (rdbD.Checked)
+                                {
+                                    respostaSelecionada = "d";
+                                }
+                                else if (rdbE.Checked)
+                                {
+                                    respostaSelecionada = "e";
+                                }
+
+                                if (respostaSelecionada.Equals(respostaCorreta, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    numeroAcertos++;
+                                    MessageBox.Show("Resposta correta!");
+                                }
+                                else
+                                {
+                                    numeroErros++;
+                                    MessageBox.Show("Resposta incorreta!");
+                                }
+
+                                leitor.Close();
+
+                                using (StreamWriter escritor = new StreamWriter(arquivoQuestaoAtual))
+                                {
+                                    escritor.WriteLine(enunciado);
+                                    escritor.WriteLine(altA);
+                                    escritor.WriteLine(altB);
+                                    escritor.WriteLine(altC);
+                                    escritor.WriteLine(altD);
+                                    escritor.WriteLine(altE);
+                                    escritor.WriteLine(resolucao);
+                                    escritor.WriteLine(numeroAcertos);
+                                    escritor.WriteLine(numeroErros);
+                                    escritor.WriteLine(respostaCorreta);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Selecione uma questão válida!");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Selecione uma opção de resposta!");
+                    }
+                }
+            }
+        }
+
     }
-}
+        }
+        
+
+        
+    
+
